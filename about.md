@@ -9,7 +9,7 @@ I hate writing about me sections.  I don't know who I am.
 
 STOP PRESSURING ME!
 
-![_config.yml]({{ site.baseurl }}/images/tina-stage-fright.png)
+![_config.yml]({{ site.baseurl }}/images/tina-stage-fright.jpg)
 
 ### Contact me
 
