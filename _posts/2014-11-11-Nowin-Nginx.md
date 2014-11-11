@@ -10,6 +10,12 @@ title: Nowin with Nginx on Linux
 
 Nginx tries to address some of the issues with apache being "bloated."  Apache's defaults focuses on the processor/threading model while Nginx is based on an event-driven model.  The [Anturis blog](https://anturis.com/blog/nginx-vs-apache/) has a pretty good comparison of them.
 
+Installing Nginx is pretty simple on Ubuntu.
+
+{% highlight Bash shell scripts %}
+sudo apt-get update
+sudo apt-get install nginx
+{% endhighlight %}
 
 
 
