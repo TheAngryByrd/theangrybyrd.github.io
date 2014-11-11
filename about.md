@@ -2,14 +2,15 @@
 layout: page
 title: About
 permalink: /about/
+published: true
 ---
 
-Some information about you!
+I hate writing about me sections.  I don't know who I am.
 
-### More Information
+STOP PRESSURING ME!
 
-A place to include any other types of information that you'd like to include about yourself. 
+![_config.yml]({{ site.baseurl }}/images/tina-stage-fright.png)
 
 ### Contact me
 
-[email@domain.com](mailto:email@domain.com)
+[jimmy.byrd@outlook.com](mailto:jimmy.byrd@outlook.com)
