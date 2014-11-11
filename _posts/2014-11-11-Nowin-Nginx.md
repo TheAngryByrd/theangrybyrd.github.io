@@ -1,6 +1,7 @@
 ---
 published: false
 layout: post
+title: Nowin with Nginx on Linux
 ---
 
 ## A New Post
