@@ -7,10 +7,14 @@ published: false
 In MVVM, I regularly have output properties, or properties that usually depend on one or more other properties within the viewmodel.  For example, say we have 2 input fields, one for first name and one for last name.  The output field would be a string.Format() of these two fields showing the full name.  
 
 Simple VM:
-{% gist TheAngryByrd/4feb42e5a8ee173e0f77 %}
+{% gist TheAngryByrd/4feb42e5a8ee173e0f77/948bbc0c5ec29f4d3bea5b6abc5cabc119543a86 %}
 
 Simple demo:
 ![Scenario 1]({{ site.url }}/images/MVVMOutput/Scenario1.jpg)
 
+The problem here if you have had experience with MVVM before is fairly obvious.  I need to Notify the UI to update FullName.
+
+{% gist TheAngryByrd/4feb42e5a8ee173e0f77/0b7a8c588f3d43038ad0bacb931cf62a9358c6a4 %}
+![Scenario 1-Fixed]({{ site.url }}/images/MVVMOutput/Scenario2.jpg)
 
 For a more "exotic" example.  Let's say there is a third input for their favorite color.  Another output property depends now on the 
