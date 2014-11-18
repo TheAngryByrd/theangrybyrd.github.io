@@ -9,7 +9,34 @@ published: true
 In MVVM, I regularly have output properties, or properties that usually depend on one or more other properties within the viewmodel.  For example, say we have 2 input fields, one for first name and one for last name.  The output field would be a string.Format() of these two fields showing the full name.  
 
 Simple VM:
-{% gist TheAngryByrd/4feb42e5a8ee173e0f77/948bbc0c5ec29f4d3bea5b6abc5cabc119543a86 %}
+{% highlight csharp %}
+ public string FirstName
+{
+    get { return _firstName; }
+    set
+    {
+        if (value == _firstName) return;
+        _firstName = value;
+        OnPropertyChanged();
+    }
+}
+ 
+public string LastName
+{
+    get { return _lastName; }
+    set
+    {
+        if (value == _lastName) return;
+        _lastName = value;
+        OnPropertyChanged();
+    }
+}
+ 
+public string FullName
+{
+    get { return string.Format("Full Name: {0} {1}", FirstName, LastName); }
+}
+{% endhighlight %}
 ![Scenario 1]({{ site.url }}/images/MVVMOutput/Scenario1.jpg)
 
 The problem here if you have had experience with MVVM before is fairly obvious.  I need to Notify the UI to update FullName.
@@ -45,7 +72,7 @@ Ok, but now we're back to not notifying the FullName or Sentence properties.  Ri
 
 WhenAnyValue allows us to get notified when a property changes.  
 {% highlight csharp %}
-	var fullName = this.WhenAnyValue(x => x.FirstName, x => x.LastName, (first, last) => new {first,last})
+var fullName = this.WhenAnyValue(x => x.FirstName, x => x.LastName, (first, last) => new {first,last})
 {% endhighlight %}
 Will let us know whenever there are changes to either FirstName or LastName and create a new object that contains both.
 
