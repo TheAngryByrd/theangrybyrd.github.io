@@ -22,7 +22,9 @@ For a more "exotic" example.  Let's say there is a third input for their favorit
 {% gist TheAngryByrd/4feb42e5a8ee173e0f77/1ae4a61ed5e2c114946637c7d076520353f4fc65 %}
 ![Scenario 1-Fixed]({{ site.url }}/images/MVVMOutput/Scenario2.jpg)
 
-Ok, sure let's just apply the same logic...not so fast.  FullName doesn't have a setter.  So I need to call OnPropertyChanged() in the things that it depends on.  Starting to smell much?
+Ok, sure let's just apply the same logic...not so fast.  FullName doesn't have a setter.  So I need to call OnPropertyChanged() in the things that it depends on.  
 
 {% gist TheAngryByrd/4feb42e5a8ee173e0f77/4569b8dd45634359cbf169ece9f21f6614681221 %}
 ![Scenario 1-Fixed]({{ site.url }}/images/MVVMOutput/Scenario2-Fixed.jpg)
+
+This code is starting to smell.
