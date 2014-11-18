@@ -39,7 +39,7 @@ public string FullName
 {% endhighlight %}
 ![Scenario 1]({{ site.url }}/images/MVVMOutput/Scenario1.jpg)
 
-The problem here, if you have had experience with MVVM before, is fairly obvious.  I need to Notify the UI to update FullName.
+The problem here, if you have had experience with MVVM before, is fairly obvious.  I need to Notify the UI to update FullName. I have to do it whenever FirstName or LastName changes.  The weird thing is, I have to do it in the setter.
 
 {% highlight csharp %}
  public string FirstName
