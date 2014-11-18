@@ -73,7 +73,7 @@ public string FullName
 {% endhighlight %}
 ![Scenario 1-Fixed]({{ site.url }}/images/MVVMOutput/Scenario1-Fixed.jpg)
 
-For a more "exotic" example.  Let's say there is a third input for their favorite color.  Another output property depends now on the FullName and the Favorite Color.
+For a more "exotic" example.  Let's say there is a third input for their favorite color.  Another output property 'Sentennce' depends now on the FullName and the Favorite Color properties.
 
 {% highlight csharp %}
 public string FirstName
