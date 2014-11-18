@@ -41,32 +41,342 @@ public string FullName
 
 The problem here if you have had experience with MVVM before is fairly obvious.  I need to Notify the UI to update FullName.
 
-{% gist TheAngryByrd/4feb42e5a8ee173e0f77/0b7a8c588f3d43038ad0bacb931cf62a9358c6a4 %}
+{% highlight csharp %}
+ public string FirstName
+{
+    get { return _firstName; }
+    set
+    {
+        if (value == _firstName) return;
+        _firstName = value;
+        OnPropertyChanged();
+        OnPropertyChanged("FullName");
+    }
+}
+ 
+public string LastName
+{
+    get { return _lastName; }
+    set
+    {
+        if (value == _lastName) return;
+        _lastName = value;
+        OnPropertyChanged();
+        OnPropertyChanged("FullName");
+    }
+}
+ 
+public string FullName
+{
+    get { return string.Format("Full Name: {0} {1}", FirstName, LastName); }
+}
+{% endhighlight %}
 ![Scenario 1-Fixed]({{ site.url }}/images/MVVMOutput/Scenario1-Fixed.jpg)
 
 For a more "exotic" example.  Let's say there is a third input for their favorite color.  Another output property depends now on the FullName and the Favorite Color.
 
-{% gist TheAngryByrd/4feb42e5a8ee173e0f77/1ae4a61ed5e2c114946637c7d076520353f4fc65 %}
-![Scenario 1-Fixed]({{ site.url }}/images/MVVMOutput/Scenario2.jpg)
+{% highlight csharp %}
+public string FirstName
+{
+    get { return _firstName; }
+    set
+    {
+        if (value == _firstName) return;
+        _firstName = value;
+        OnPropertyChanged();
+        OnPropertyChanged("FullName");
+    }
+}
+ 
+public string LastName
+{
+    get { return _lastName; }
+    set
+    {
+        if (value == _lastName) return;
+        _lastName = value;
+        OnPropertyChanged();
+        OnPropertyChanged("FullName");
+    }
+}
+ 
+public string FullName
+{
+    get { return string.Format("Full Name: {0} {1}", FirstName, LastName); }
+}
+ 
+public string FavoriteColor
+{
+    get { return _favoriteColor; }
+    set
+    {
+        if (value == _favoriteColor) return;
+        _favoriteColor = value;
+        OnPropertyChanged();
+    }
+}
+ 
+public string Sentence
+{
+    get { return string.Format("{0}'s favorite color is: {1}", FullName, FavoriteColor); }
+}
+{% endhighlight %}
+![Scenario 2]({{ site.url }}/images/MVVMOutput/Scenario2.jpg)
 
 Ok, sure let's just apply the same logic...not so fast.  FullName doesn't have a setter.  So I need to call OnPropertyChanged() in the things that it depends on.  
 
-{% gist TheAngryByrd/4feb42e5a8ee173e0f77/4569b8dd45634359cbf169ece9f21f6614681221 %}
-![Scenario 1-Fixed]({{ site.url }}/images/MVVMOutput/Scenario2-Fixed.jpg)
+{% highlight csharp %}
+public string FirstName
+{
+    get { return _firstName; }
+    set
+    {
+        if (value == _firstName) return;
+        _firstName = value;
+        OnPropertyChanged();
+        OnPropertyChanged("FullName");
+        OnPropertyChanged("Sentence");
+    }
+}
+ 
+public string LastName
+{
+    get { return _lastName; }
+    set
+    {
+        if (value == _lastName) return;
+        _lastName = value;
+        OnPropertyChanged();
+        OnPropertyChanged("FullName");
+        OnPropertyChanged("Sentence");
+    }
+}
+ 
+public string FullName
+{
+    get { return string.Format("Full Name: {0} {1}", FirstName, LastName); }
+}
+ 
+public string FavoriteColor
+{
+    get { return _favoriteColor; }
+    set
+    {
+        if (value == _favoriteColor) return;
+        _favoriteColor = value;
+        OnPropertyChanged();
+        OnPropertyChanged("Sentence");
+    }
+}
+ 
+public string Sentence
+{
+    get { return string.Format("{0}'s favorite color is: {1}", FullName, FavoriteColor); }
+}
+{% endhighlight %}
+![Scenario 2-Fixed]({{ site.url }}/images/MVVMOutput/Scenario2-Fixed.jpg)
 
 This code is starting to smell.  We have setters becoming full of notify the UI of changes for properties that aren't directly associated with them.  I've seen code with something like:
-{% gist TheAngryByrd/4feb42e5a8ee173e0f77/e1ff07217f5b1f6a5cadab8d9b83ad355f74a2ba %}
+{% highlight csharp %}
+public void NotifyALlTheThings()
+{
+    //Reflect over all properties and notifyChanges
+}
+{% endhighlight %}
 
 Just because they (I) couldn't keep track of all the dependencies.
 
 Well there **Is A Better Way**™.  [ReactiveUI](https://github.com/reactiveui/ReactiveUI) which uses [Reactive Extensions](https://github.com/Reactive-Extensions/Rx.NET) (Rx) allows us to create a pipeline effect for our notifications.
 
 I'll show the complete viewmodel before we make any changes:
-{% gist TheAngryByrd/4feb42e5a8ee173e0f77/d41f016e14afbbcc6e27f945bbef8452c0b5e0c8 %}
+{% highlight csharp %}
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using OutputProperties.Annotations;
+ 
+namespace OutputProperties
+{
+    public class MainWindowViewModel : INotifyPropertyChanged
+    {
+        private string _firstName;
+        private string _lastName;
+        private string _favoriteColor;
+        public event PropertyChangedEventHandler PropertyChanged;
+ 
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+ 
+        public string FirstName
+        {
+            get { return _firstName; }
+            set
+            {
+                if (value == _firstName) return;
+                _firstName = value;
+                OnPropertyChanged();
+                OnPropertyChanged("FullName");
+                OnPropertyChanged("Sentence");
+            }
+        }
+ 
+        public string LastName
+        {
+            get { return _lastName; }
+            set
+            {
+                if (value == _lastName) return;
+                _lastName = value;
+                OnPropertyChanged();
+                OnPropertyChanged("FullName");
+                OnPropertyChanged("Sentence");
+            }
+        }
+ 
+        public string FullName
+        {
+            get { return string.Format("Full Name: {0} {1}", FirstName, LastName); }
+        }
+ 
+        public string FavoriteColor
+        {
+            get { return _favoriteColor; }
+            set
+            {
+                if (value == _favoriteColor) return;
+                _favoriteColor = value;
+                OnPropertyChanged();
+                OnPropertyChanged("Sentence");
+            }
+        }
+ 
+        public string Sentence
+        {
+            get { return string.Format("{0}'s favorite color is: {1}", FullName, FavoriteColor); }
+        }
+     
+    }
+}
+{% endhighlight %}
 
 First, we'll get ReactiveUI from NuGet.  Then we'll replace our INotifyChanged with ReactiveObject.  That forces us to change the setters.  That's ok, there's a nice method for checking for update changed and raise all in one call.  this.RaiseAndSetIfChanged().
 
-{% gist TheAngryByrd/4feb42e5a8ee173e0f77/74b80644b268247f820caefd4ca8bbbfa13627f5 %}
+{% highlight csharp %}
+using ReactiveUI;
+ 
+namespace OutputProperties
+{
+    public class MainWindowViewModel : ReactiveObject
+    {
+        private string _firstName;
+        private string _lastName;
+        private string _favoriteColor;
+ 
+        public string FirstName
+        {
+            get { return _firstName; }
+            set { this.RaiseAndSetIfChanged(ref _firstName, value); }
+        }
+ 
+        public string LastName
+        {
+            get { return _lastName; }
+            set { this.RaiseAndSetIfChanged(ref _lastName, value); }
+        }
+ 
+        public string FullName
+        {
+            get { return string.Format("Full Name: {0} {1}", FirstName, LastName); }
+        }
+ 
+        public string FavoriteColor
+        {
+            get { return _favoriteColor; }
+            set { this.RaiseAndSetIfChanged(ref _favoriteColor, value); }
+        }
+ 
+        public string Sentence
+        {
+            get { return string.Format("{0}'s favorite color is: {1}", FullName, FavoriteColor); }
+        }
+     
+    }
+}
+{% endhighlight %}
 
 Ok, but now we're back to not notifying the FullName or Sentence properties.  Right, we need to talk about some more ReactiveUI first.  Specifically, WhenAnyValue, ObservableAsPropertyHelper and ToProperty.  
 
@@ -78,18 +388,109 @@ Will let us know whenever there are changes to either FirstName or LastName and 
 
 Now ObservableAsPropertyHelper and ToProperty go hand in hand. ObservableAsPropertyHelper is an output property in ReactiveUI. ToProperty allows us to set this property.
 
-{% gist TheAngryByrd/4feb42e5a8ee173e0f77/b71729a8122927835ba25f590b1d489238eada9e %}
+{% highlight csharp %}
+ObservableAsPropertyHelper<string> _fullName;
+public string FullName
+{
+    get { return _fullName.Value; }
+}
+public MainWindowViewModel()
+{
+    this.WhenAnyValue(x => x.FirstName, x => x.LastName, (first, last) => new {first,last})
+        .Select(name => string.Format("Full Name: {0} {1}", name.first, name.last))
+        .ToProperty(this, x => x.FullName, out _fullName);
+}
+{% endhighlight %}
 
 Now we can see the train of how FullName will get it's value.  Anytime FirstName or LastName update, select a string.Format() of them and update the fullname property.
 
 Ok, well lets fix Sentence:
 
-{% gist TheAngryByrd/4feb42e5a8ee173e0f77/8dce702a6079113be286460f4645e0118e95c17b %}
+{% highlight csharp %}   ObservableAsPropertyHelper<string> _fullName;
+public string FullName
+{
+    get { return _fullName.Value; }
+}
+
+
+ObservableAsPropertyHelper<string> _sentence;
+public string Sentence
+{
+    get { return _sentence.Value; }
+}
+public MainWindowViewModel()
+{
+    this.WhenAnyValue(x => x.FirstName, x => x.LastName, (first, last) => new {first,last})
+        .Select(name => string.Format("Full Name: {0} {1}", name.first, name.last))
+        .ToProperty(this, x => x.FullName, out _fullName);
+
+    this.WhenAnyValue(x => x.FullName, x => x.FavoriteColor, (full,color) => new {full,color})
+        .Select(x => string.Format("{0}'s favorite color is: {1}", x.full, x.color))
+        .ToProperty(this, x => x.Sentence, out _sentence);
+}
+{% endhighlight %}
 
 Now we see the true intent.  Anytime FullName or FavoriteColor is updated, we should change the SentenceProperty.
 
-Full end gist:
-{% gist TheAngryByrd/4feb42e5a8ee173e0f77/859288ab239106d13af1663277b32d67f87a6cec %}
+Full end result:
+{% highlight csharp %}
+using System.Reactive.Linq;
+using ReactiveUI;
+ 
+namespace OutputProperties
+{
+    public class MainWindowViewModel : ReactiveObject
+    {
+        private string _firstName;
+        private string _lastName;
+        private string _favoriteColor;
+ 
+ 
+        ObservableAsPropertyHelper<string> _fullName;
+        public string FullName
+        {
+            get { return _fullName.Value; }
+        }
+ 
+ 
+        ObservableAsPropertyHelper<string> _sentence;
+        public string Sentence
+        {
+            get { return _sentence.Value; }
+        }
+        public MainWindowViewModel()
+        {
+            this.WhenAnyValue(x => x.FirstName, x => x.LastName, (first, last) => new {first,last})
+                .Select(name => string.Format("Full Name: {0} {1}", name.first, name.last))
+                .ToProperty(this, x => x.FullName, out _fullName);
+ 
+            this.WhenAnyValue(x => x.FullName, x => x.FavoriteColor, (full,color) => new {full,color})
+                .Select(x => string.Format("{0}'s favorite color is: {1}", x.full, x.color))
+                .ToProperty(this, x => x.Sentence, out _sentence);
+        }
+ 
+        public string FirstName
+        {
+            get { return _firstName; }
+            set { this.RaiseAndSetIfChanged(ref _firstName, value); }
+        }
+ 
+        public string LastName
+        {
+            get { return _lastName; }
+            set { this.RaiseAndSetIfChanged(ref _lastName, value); }
+        }
+ 
+        public string FavoriteColor
+        {
+            get { return _favoriteColor; }
+            set { this.RaiseAndSetIfChanged(ref _favoriteColor, value); }
+        }
+ 
+     
+    }
+}
+{% endhighlight %}
 
 [Source code](https://github.com/TheAngryByrd/MVVM-Output-Properties/)
 
