@@ -6,7 +6,7 @@ published: true
 
 ## MVVM Woes - Output properties
 
-In MVVM, I regularly have output properties, or properties that usually depend on one or more other properties within the viewmodel.  For example, say we have 2 input fields, one for first name and one for last name.  The output field would be a string.Format() of these two fields showing the full name.  
+In MVVM, I regularly have output properties, or properties that usually depend on one or more other properties within the viewmodel.  For example, say we have two input fields, one for first name and one for last name.  The output field would be a string.Format() of these two fields showing the full name.  
 
 Simple VM:
 {% highlight csharp %}
