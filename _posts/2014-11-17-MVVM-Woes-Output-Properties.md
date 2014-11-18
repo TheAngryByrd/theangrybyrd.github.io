@@ -178,7 +178,7 @@ public string Sentence
 
 This code is starting to smell.  We have setters becoming full of notify the UI of changes for properties that aren't directly associated with them.  I've seen code with something like:
 {% highlight csharp %}
-public void NotifyALlTheThings()
+public void NotifyAllTheThings()
 {
     //Reflect over all properties and notifyChanges
 }
