@@ -29,3 +29,10 @@ This code is starting to smell.  I've seen code with something like:
 {% gist TheAngryByrd/4feb42e5a8ee173e0f77/e1ff07217f5b1f6a5cadab8d9b83ad355f74a2ba %}
 
 Just because they (I) couldn't keep track of all the dependencies.
+
+Well there **Is A Better Way**™.  [ReactiveUI](https://github.com/reactiveui/ReactiveUI) which uses [Reactive Extensions](https://github.com/Reactive-Extensions/Rx.NET) (Rx) allows us to create a pipeline effect for our depdency properties.
+
+I'll show the complete viewmodel before we make any changes:
+{% gist TheAngryByrd/4feb42e5a8ee173e0f77/d41f016e14afbbcc6e27f945bbef8452c0b5e0c8 %}
+
+
