@@ -123,7 +123,7 @@ public string Sentence
 {% endhighlight %}
 ![Scenario 2]({{ site.url }}/images/MVVMOutput/Scenario2.jpg)
 
-Ok, sure let's just apply the same logic...not so fast.  FullName doesn't have a setter.  So I need to call OnPropertyChanged() in the things that it depends on.  
+Ok, sure let's just apply the same logic...not so fast.  FullName doesn't have a setter.  So I need to call OnPropertyChanged() in the things that FullName depends on, which is FirstName and LastName.  
 
 {% highlight csharp %}
 public string FirstName
