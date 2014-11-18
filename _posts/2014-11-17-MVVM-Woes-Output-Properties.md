@@ -1,4 +1,6 @@
 ---
+layout: post
+title: "MVVM Woes - Output properties"
 published: true
 ---
 
