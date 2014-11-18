@@ -314,9 +314,9 @@ WhenAnyValue allows us to get notified when a property changes.
 {% highlight csharp %}
 var fullName = this.WhenAnyValue(x => x.FirstName, x => x.LastName, (first, last) => new {first,last})
 {% endhighlight %}
-Will let us know whenever there are changes to either FirstName or LastName and create a new object that contains both.
+This will let us know whenever there are changes to either FirstName or LastName and create a new object that contains both.
 
-Now ObservableAsPropertyHelper and ToProperty go hand in hand. ObservableAsPropertyHelper is an output property in ReactiveUI. ToProperty allows us to set this property.
+Now ObservableAsPropertyHelper and ToProperty go hand in hand. ObservableAsPropertyHelper boiler plate for an output property in ReactiveUI. ToProperty allows us to set this property.
 
 {% highlight csharp %}
 ObservableAsPropertyHelper<string> _fullName;
