@@ -30,9 +30,25 @@ This code is starting to smell.  I've seen code with something like:
 
 Just because they (I) couldn't keep track of all the dependencies.
 
-Well there **Is A Better Way**™.  [ReactiveUI](https://github.com/reactiveui/ReactiveUI) which uses [Reactive Extensions](https://github.com/Reactive-Extensions/Rx.NET) (Rx) allows us to create a pipeline effect for our depdency properties.
+Well there **Is A Better Way**™.  [ReactiveUI](https://github.com/reactiveui/ReactiveUI) which uses [Reactive Extensions](https://github.com/Reactive-Extensions/Rx.NET) (Rx) allows us to create a pipeline effect for our notifications.
 
 I'll show the complete viewmodel before we make any changes:
 {% gist TheAngryByrd/4feb42e5a8ee173e0f77/d41f016e14afbbcc6e27f945bbef8452c0b5e0c8 %}
+
+First, we'll get ReactiveUI from NuGet.  Then we'll replace our INotifyChanged with ReactiveObject.  That forces us to change the setters.  That's ok, there's a nice method for checking for update changed and raise all in one call.  this.RaiseAndSetIfChanged().
+
+{% gist TheAngryByrd/4feb42e5a8ee173e0f77/74b80644b268247f820caefd4ca8bbbfa13627f5 %}
+
+Ok, but now we're back to not notifying the FullName or Sentence properties.  Right, we need to talk about some more ReactiveUI first.  Specifically, WhenAnyValue and ToProperty.  
+
+WhenAnyValue allows us to get notified when a property changes.  
+
+{% highlight csharp %}
+var fullName = this.WhenAnyValue(x => x.FirstName, x => x.LastName, (first, last) => new {first,last})
+{% endhighlight %}
+
+
+
+
 
 
