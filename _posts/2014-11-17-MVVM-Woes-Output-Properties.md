@@ -8,8 +8,6 @@ In MVVM, I regularly have output properties, or properties that usually depend o
 
 Simple VM:
 {% gist TheAngryByrd/4feb42e5a8ee173e0f77/948bbc0c5ec29f4d3bea5b6abc5cabc119543a86 %}
-
-Simple demo:
 ![Scenario 1]({{ site.url }}/images/MVVMOutput/Scenario1.jpg)
 
 The problem here if you have had experience with MVVM before is fairly obvious.  I need to Notify the UI to update FullName.
@@ -27,4 +25,7 @@ Ok, sure let's just apply the same logic...not so fast.  FullName doesn't have a
 {% gist TheAngryByrd/4feb42e5a8ee173e0f77/4569b8dd45634359cbf169ece9f21f6614681221 %}
 ![Scenario 1-Fixed]({{ site.url }}/images/MVVMOutput/Scenario2-Fixed.jpg)
 
-This code is starting to smell.
+This code is starting to smell.  I've seen code with something like:
+{% gist TheAngryByrd/4feb42e5a8ee173e0f77/e1ff07217f5b1f6a5cadab8d9b83ad355f74a2ba %}
+
+Just because they (I) couldn't keep track of all the dependencies.
