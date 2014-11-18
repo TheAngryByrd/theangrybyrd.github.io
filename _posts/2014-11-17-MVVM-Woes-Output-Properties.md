@@ -25,7 +25,7 @@ Ok, sure let's just apply the same logic...not so fast.  FullName doesn't have a
 {% gist TheAngryByrd/4feb42e5a8ee173e0f77/4569b8dd45634359cbf169ece9f21f6614681221 %}
 ![Scenario 1-Fixed]({{ site.url }}/images/MVVMOutput/Scenario2-Fixed.jpg)
 
-This code is starting to smell.  I've seen code with something like:
+This code is starting to smell.  We have setters becoming full of notify the UI of changes for properties that aren't directly associated with them.  I've seen code with something like:
 {% gist TheAngryByrd/4feb42e5a8ee173e0f77/e1ff07217f5b1f6a5cadab8d9b83ad355f74a2ba %}
 
 Just because they (I) couldn't keep track of all the dependencies.
@@ -39,13 +39,31 @@ First, we'll get ReactiveUI from NuGet.  Then we'll replace our INotifyChanged w
 
 {% gist TheAngryByrd/4feb42e5a8ee173e0f77/74b80644b268247f820caefd4ca8bbbfa13627f5 %}
 
-Ok, but now we're back to not notifying the FullName or Sentence properties.  Right, we need to talk about some more ReactiveUI first.  Specifically, WhenAnyValue and ToProperty.  
+Ok, but now we're back to not notifying the FullName or Sentence properties.  Right, we need to talk about some more ReactiveUI first.  Specifically, WhenAnyValue, ObservableAsPropertyHelper and ToProperty.  
 
 WhenAnyValue allows us to get notified when a property changes.  
-
 {% highlight csharp %}
-var fullName = this.WhenAnyValue(x => x.FirstName, x => x.LastName, (first, last) => new {first,last})
+	var fullName = this.WhenAnyValue(x => x.FirstName, x => x.LastName, (first, last) => new {first,last})
 {% endhighlight %}
+Will let us know whenever there are changes to either FirstName or LastName and create a new object that contains both.
+
+Now ObservableAsPropertyHelper and ToProperty go hand in hand. ObservableAsPropertyHelper is an output property in ReactiveUI. ToProperty allows us to set this property.
+
+{% gist TheAngryByrd/4feb42e5a8ee173e0f77/b71729a8122927835ba25f590b1d489238eada9e %}
+
+Now we can see the train of how FullName will get it's value.  Anytime FirstName or LastName update, select a string.Format() of them and update the fullname property.
+
+Ok, well lets fix Sentence:
+
+{% gist TheAngryByrd/4feb42e5a8ee173e0f77/8dce702a6079113be286460f4645e0118e95c17b %}
+
+Now we see the true intent.  Anytime FullName or FavoriteColor is updated, we should change the SentenceProperty.
+
+Full end gist:
+{% gist TheAngryByrd/4feb42e5a8ee173e0f77/859288ab239106d13af1663277b32d67f87a6cec %}
+
+[Source code](https://github.com/TheAngryByrd/MVVM-Output-Properties/)
+
 
 
 
