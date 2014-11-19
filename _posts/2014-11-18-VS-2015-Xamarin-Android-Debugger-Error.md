@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Visual Studio 2015 Preview Android error
+title: "Visual Studio 2015 Preview Android error"
 published: true
 ---
 ## Visual Studio 2015 Preview Android error.
