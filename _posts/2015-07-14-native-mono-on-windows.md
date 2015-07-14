@@ -11,11 +11,20 @@ I spent the last few days trying to get an app running on mono without the depen
 1. Install Mono
 2. Install Cygwin
   1. Install the packages gcc-mingw, mingw-zlib1, mingw-zlib-devel, and pkg-config
-3. Use [this script](https://gist.github.com/shilrobot/3005371) in some compacity.
+3. Use mkbundle
+4. Copy mono-2.0.dll
+
+Use [this script](https://gist.github.com/shilrobot/3005371) in some compacity.
 
 Well, it's never that simple is it?
 
-Trying it out on a HelloWorld.exe I get this.
+AA doesn't exist?  Well investigating a little bit, mingw provides an assembler, I just added tis export
+
+```bash
+export AS="i686-pc-mingw32-as"
+```
+
+Lets run it again!
 
 ```bash
 OS is: Windows
@@ -44,3 +53,28 @@ i686-pc-mingw32-gcc: error: unrecognized command line option ‘--libs’
 i686-pc-mingw32-gcc: error: mono-2`: No such file or directory
 ERROR: [Fail]
 ```
+
+FAILURE. pkg-config can't be found? Seems like I can find it.
+
+```base
+$ pkg-config --cflags --libs mono-2
+-mms-bitfields -I/cygdrive/c/progra~2/Mono/lib/pkgconfig/../../include/mono-2.0 -L/cygdrive/c/progra~2/Mono/lib/pkgconfig/../../lib -lmono-2.0 -mms-bitfields -lws2_32 -lpsapi -lole32 -lwinmm -loleaut32 -ladvapi32 -lversion
+```
+
+I must be missing something here.  Hopefully someone can point it out.  However, if I decide to run the compile using mingw in a seperate step I actually get some output!
+
+```bssh
+i686-pc-mingw32-gcc -U _WIN32 -g -o Output.exe -Wall temp.c `pkg-config --cflags --libs mono-2`  temp.o
+```
+
+Lets run the exe!
+
+... Blank?  BLANK?
+
+Well [stackoverflow](https://stackoverflow.com/questions/7507944/mkbundle-produces-non-functional-exe?rq=1) has something to say about it. What is this -mwindows flag used for?  According to the [MinGW FAQ](http://www.mingw.org/wiki/FAQ) it's used to removed DOS from showing up.  Ahhh.  So you're telling me I have to remove some flags from a file to get console programs to work?  Fun day.  Hopefully someone can figure out a way around this.
+
+But after removing that -mwindows flag, success!
+
+So behold, the master script to do all the things!
+bootstrapper.bat gets mono and cygwin and packages.
+mkbundler.sh will be run by cygwin to do the mkbundle, compile, and copying of mono-2.0.dll
