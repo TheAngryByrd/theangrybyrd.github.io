@@ -8,14 +8,16 @@ published: true
 
 ## Introduction
 
-Have you been in a situation where you've written unit tests against your code but still end up having some type of issue in production?  For instance you might be trying to read/write to a file.  In your unit tests your parsing/printing is great but when you go to production, something happened out of your control, such as a file permission, encoding issues, or if you're using a third party tool that writes files, on which you must base your assumptions. Or another scenario, wouldn't it be great to test those queries you've written for your database?  I know you've written an [anti-corruption layer to create your domain objects](https://fsharpforfunandprofit.com/ddd/), but still, wouldn't it be great to integration test some of these scenarios?
 
-Integration tests seem to get a bad reputation, and to be fair it's understandable.  They tend to be hard to setup, brittle, and high maintenance when underlying assumptions change about your code base. Another big issue with them tends to be isolation and cleanup. However, there is a solution to some of these problems.  We can create disposable objects that generate unique isolated environments and then clean them up afterward.
+Have you written unit tests against your code but still had some type of issue in production? For example, your code reads and writes to a file. In your unit tests parsing and printing are great. But, when you go to production, something happens out of your control. File permissions, encoding, and faulty assumptions about third-party tools are all common issues. Or in another case, wouldn’t it be great to test those queries you’ve written for your database? I know you’ve written an [anti-corruption layer to create your domain objects](https://fsharpforfunandprofit.com/ddd/). But still, shouldn't we be doing integration tests in some of these scenarios?
+
+Integration tests seem to get a bad reputation, and to be fair it’s understandable why. They tend to be hard to setup, brittle, and high maintenance when underlying assumptions change about your code base. Another big issue with them tends to be isolation and cleanup. There is a solution to some of these problems. We can create disposable objects that generate unique, isolated environments and clean themselves up. 
 
 
 ## What are disposables?
 
-Dotnet has this concept of the [disposable pattern](https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/dispose-pattern).  Getting deep into this is outside the scope of this blog.  The sales pitch is, wouldn't it be nice for something to clean itself up after it has left a scope and you don't have to remember to call it yourself?  The super simple example in F#:
+Dotnet has this concept of the ["disposable" pattern](https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/dispose-pattern). Digging deep into this is outside the scope of this blog. Here's the sales pitch: wouldn’t it be nice for something to clean itself up after it has left a scope and you don’t have to remember to call it yourself? Now, lets see a super simple example in F#: 
+
 
 ```FSharp
 let myFunction () =
@@ -23,12 +25,12 @@ let myFunction () =
     myresource.DoOperation()
 ```
 
-This function news up an object called `Resource` then calls `DoOperation` on that object. And after that function is called, the `Dispose` method of the `Resource` object will be called.  Many dotnet developer are familiar doing this pattern with database connections/commands/readers. For more indepth examples please refer to [F# fun and profit](https://fsharpforfunandprofit.com/posts/let-use-do/#use-bindings)
+This function news up an object called `Resource` then calls `DoOperation` on that object. After that function is called, the `Dispose` method of the `Resource` object will be called.  Many dotnet developers are familiar doing this pattern with database connections, commands, and readers. For more in-depth examples please refer to [F# for Fun and Profit](https://fsharpforfunandprofit.com/posts/let-use-do/#use-bindings).
 
 
 ## The setup
 
-My F# test framework of choice is [Expecto](https://github.com/haf/expecto).  By default it runs all tests in parallel so it's difficult to use any global or shared state, which our goal is to have isolated environment for our tests so this constraint is good thing.  To facilitate testing using disposables with async, I had to create a few helpers.
+My F# test framework of choice is [Expecto](https://github.com/haf/expecto). By default it runs all tests in parallel so it’s difficult to use any global or shared state.  Our goal is to have isolated environment for our tests, so this constraint helps us. To aid testing using disposables with async, I had to create a few helpers. 
 
 ```FSharp
 type ParameterizedTest<'a> =
@@ -54,7 +56,7 @@ let inline testFixture'<'a> setup =
 
 ## Disposable Directory 
 
-For the first scnario I've listed, let's create a disposable directory.  It's requirements are it should be isolated, cleanup after itself, and tell us which directory it created.
+For the first example given, let's create a disposable directory.  It's requirements are that it should be isolated, cleanup after itself, and tell us which directory it created.
 
 ```FSharp
 [<AllowNullLiteral>]
@@ -71,11 +73,11 @@ type private DisposableDirectory (directory : string) =
             IO.Directory.Delete(x.DirectoryInfo.FullName,true)
 ```
 
-I defined a function to creating the object `Create`, it uses dotnet's `GetTempPath` to find the designated temporary directory for your operating system, generates a guid and then creates that directory.  
+I defined a function to create the object `Create`, it uses dotnet's `GetTempPath` to find the designated temporary directory for your operating system, generates a guid and then creates that directory.  
 
 The implementation of the IDisposable will delete this directory.  The `true` part of the parameter is for recursive deletion.
 
-For exposing the directory path, I like using `DirectoryInfo` since we as an industry still have an obsession with primitives and its better to [use the type system](https://fsharpforfunandprofit.com/posts/designing-with-types-single-case-dus/) to describe your intent.
+For exposing the directory path, I like using `DirectoryInfo`. We as an industry still have an obsession with primitives and its better to [use the type system](https://fsharpforfunandprofit.com/posts/designing-with-types-single-case-dus/) to describe your intent.
 
 The print statements are for verbosity of this demo.
 
@@ -117,7 +119,7 @@ The function `withDisposableDirectory` is a helper to create disposable director
 
 `disposableDirectoryTests` is a list of `testCase'` or `testCaseAsync'` that takes in a `IO.DirectoryInfo` so the test has access to the file path it created.
 
-Then finally we're telling expected to make these as tests in the last section.
+Finally, we're telling `expecto` to make these as tests in the last section.
 
 Lets run them and see the output:
 
@@ -130,12 +132,12 @@ Deleting directory /var/folders/14/mp4bnvkn3fq5mqcgqscm5c040000gn/T/bfa68a425def
 [15:45:30 INF] EXPECTO! 2 tests run in 00:00:00.1009410 for Disposable Directory tests – 2 passed, 0 ignored, 0 failed, 0 errored. Success! <Expecto>
 ````
 
-So we can see our print statements telling us where it created the directories and when they deleted them. Each test has their own isolated folder.  Neat!
+We can see our print statements telling us where it created the directories and when it deleted them. Each test has their own isolated folder. Neat!
 
 
 ## Disposable Database
 
-For databases, we're going to take a similar approach.  I'll be using Postgres with Npgsql in this example. Setting up postgres is outside the scope of this blog post.  We'll be doing something similar to the Disposable Directory example.  
+For databases, we're going to take a similar approach.  I'll be using Postgres with Npgsql in this example. Setting up Postgres is outside the scope of this blog post.  We'll be doing something similar to the Disposable Directory example.  
 
 
 ```FSharp
@@ -206,10 +208,9 @@ let disposableDirectoryTests = [
 ]
 ```
 
-So each our test will now get their own isolated environment to run queries in.  Neat!
+Every test will now get its own isolated environment to run queries in. Neat!
 
 
 ## Conclusion
 
-Hopefully by now you can see it does take some work to get integration tests setup, but with some effort, you can make them less brittle and bevave as isolated environments. You could expand on this to even include spinning up and down docker containers or virtual machines with vagrant.  Now I admit, this feels like _abusing_ disposables but if we're doing it for only test purposes I see benefit.  
-
+By now you can see it does take some work to get integration tests setup. But with some effort, you can make them less brittle and behave as isolated environments. You could expand on this to even include spinning up and down Docker containers, or virtual machines with Vagrant. Now I admit, this feels like _abusing_ disposables. Yet there are benefits in doing this for test purposes.
