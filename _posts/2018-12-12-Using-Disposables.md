@@ -202,7 +202,7 @@ let disposableDirectoryTests = [
   testCaseAsync' "Read count from database" <| fun (connStr : NpgsqlConnectionStringBuilder) -> async {
         use conn = new NpgsqlConnection(connStr.ToString())
         use cmd = new NpgsqlCommand("SELECT COUNT(*) FROM animals)", conn)
-        let! reader = cmd.ExecuteReaderAsync() |> Async.AwaitTask
+        use! reader = cmd.ExecuteReaderAsync() |> Async.AwaitTask
         let! canRead = reader.ReadAsync() |> Async.AwaitTask
         let count = reader.GetInt64(0)
         Expect.equal count 0L "Should have 0 rows"
