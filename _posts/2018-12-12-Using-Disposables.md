@@ -6,6 +6,8 @@ published: true
 
 # (Ab)using Disposables for Integration Testing
 
+(Looking for just the code? [Disposable examples](https://github.com/TheAngryByrd/DisposableExamples))
+
 ## Introduction
 
 
@@ -213,4 +215,4 @@ Every test will now get its own isolated environment to run queries in. Neat!
 
 ## Conclusion
 
-By now you can see it does take some work to get integration tests setup. But with some effort, you can make them less brittle and behave as isolated environments. You could expand on this to even include spinning up and down Docker containers, or virtual machines with Vagrant. Now I admit, this feels like _abusing_ disposables. Yet there are benefits in doing this for test purposes.
+By now you can see it does take some work to get integration tests setup. But with some effort, you can make them less brittle and behave as isolated environments. You could expand on this to even include spinning up and down Docker containers, or virtual machines with Vagrant. Now I admit, this feels like _abusing_ disposables. Yet there are benefits in doing this for test purposes. Here's the repo with [Disposable examples](https://github.com/TheAngryByrd/DisposableExamples). 
