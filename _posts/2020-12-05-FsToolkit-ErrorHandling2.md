@@ -23,6 +23,8 @@ I'm happy to announce [FsToolkit.ErrorHandling 2.0](https://github.com/demystify
 And I'll be covering for creators of computation expressions:
   - [Source member](https://stackoverflow.com/questions/35286541/why-would-you-use-builder-source-in-a-custom-computation-expression-builder) (I can't find a better resource on it than this StackOverflow post.)
 
+This is part of the [2020 F# Advent event](https://sergeytihon.com/2020/10/22/f-advent-calendar-in-english-2020/).  Take a look at that for other great blog posts coming out.
+
 ## Applicatives
 
 [Applicatives](https://devblogs.microsoft.com/dotnet/announcing-f-5/#applicative-computation-expressions) were introduced [F# 5.0](https://devblogs.microsoft.com/dotnet/announcing-f-5/). We initially added support during F# 5.0 for it [PR #75](https://github.com/demystifyfp/FsToolkit.ErrorHandling/pull/75) which was released in [1.3.0](https://github.com/demystifyfp/FsToolkit.ErrorHandling/releases/tag/1.3.0) but it's worth covering it here in the 2.0 announcement.  
@@ -75,7 +77,11 @@ Result:
 Error ["Cant be negative"; "'daba dee daba die' isn't a color"]
 ```
 
+As you can see you now have a list of possible errors.  For a more in depth look at the validation CE, take a look at another FsAdvent blog [Validation with F# 5 and FsToolkit](https://www.compositional-it.com/news-blog/validation-with-f-5-and-fstoolkit/) by CompositionalIT.
+
 Currently there is no implementation for `asyncValidation`, `taskValidation`, or `jobValidation`. I haven't seen the use case for this but I'm open to Pull Requests for them!
+
+If you want to expand your mind even more around applicatives checkout another great FsAdvent post, [Applicative Computation Expressions - 3](https://thinkbeforecoding.com/post/2020/12/03/applicative-computation-expressions-3) by Jeremie Chassaing.
 
 ## Ply
 
