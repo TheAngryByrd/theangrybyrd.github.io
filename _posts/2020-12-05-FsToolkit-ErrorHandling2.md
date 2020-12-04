@@ -95,17 +95,18 @@ Ply was added in [PR #97](https://github.com/demystifyfp/FsToolkit.ErrorHandling
 
 Under the covers we're only using the `task` builder since it's the most flexible but in higher performance scenarios you may want to look at the other builders and decide if making your own `vtaskResult` implementation makes sense.
 
-On the initial PR for Ply since we were using Context Insentive tasks (e.g. `ConfigureAwait(false)`). In [Issue #106](https://github.com/demystifyfp/FsToolkit.ErrorHandling/issues/106#issuecomment-728674251) it was brought up this can have performance impacts and there's some compelling evidence as to why not to use `ConfigureAwait(false)`.  With [PR #107](https://github.com/demystifyfp/FsToolkit.ErrorHandling/pull/107) by [Swoorup](https://github.com/Swoorup) we are now using Context Sensitive Tasks.  I'm still unclear as to what effects this may have on code-bases. From my understanding, this may affect Desktop UI application but not for Server applications.  Please open any issues if this does impact your applications. 
+On the initial PR for Ply, we were using Context Insentive tasks (e.g. `ConfigureAwait(false)`). In [Issue #106](https://github.com/demystifyfp/FsToolkit.ErrorHandling/issues/106#issuecomment-728674251) it was brought up this can have performance impacts and there's some compelling evidence as to why not to use `ConfigureAwait(false)`. With [PR #107](https://github.com/demystifyfp/FsToolkit.ErrorHandling/pull/107) by [Swoorup](https://github.com/Swoorup) we are now using Context Sensitive Tasks. I'm still unclear as to what effects this may have on code-bases. From my understanding, this may affect Desktop UI application but not for Server applications.  Please open any issues if this does impact your applications. 
 
 To convert from using TaskBuilder.fs (assuming you don't have anything else pulling in Taskbuilder.fs) `FSharp.Control.Tasks.V2.ContextInsensitive` with `FSharp.Control.Tasks`.
 
 ## Source overload
 
-The last thing I'd like to cover doesn't affect consumers of this library but something that authors of Computation Expression libraries may be unfamiliar with. 
+The last thing I'd like to cover doesn't affect consumers of this library but is something that authors of Computation Expression libraries may be unfamiliar with. 
 
-I was investigating how [FSharp.Control.FusionTasks](https://github.com/kekyo/FSharp.Control.FusionTasks) was handling it's binding overloads and I came across an overload I was not familiar with, the [Source method](https://github.com/kekyo/FSharp.Control.FusionTasks/blob/master/FSharp.Control.FusionTasks/AsyncExtensions.fs#L194-L210). I came across [this StackOverflow post](https://stackoverflow.com/questions/35286541/why-would-you-use-builder-source-in-a-custom-computation-expression-builder) that explained it. 
+I was investigating how [FSharp.Control.FusionTasks](https://github.com/kekyo/FSharp.Control.FusionTasks) was handling its binding overloads and I came across an overload I was not familiar with, the [Source method](https://github.com/kekyo/FSharp.Control.FusionTasks/blob/master/FSharp.Control.FusionTasks/AsyncExtensions.fs#L194-L210). I came across [this StackOverflow post](https://stackoverflow.com/questions/35286541/why-would-you-use-builder-source-in-a-custom-computation-expression-builder) that explained it.
 
-The main issue I faced with the current implementation of the `result` and friends was maintainability.  I had to add _so many_ overloads for `BindResult` and `MergeSources` to get things to work correctly for different types, such as `Choice`. What the `Source` member do is [remove a lot of that repetitive, unmaintainable code](https://github.com/demystifyfp/FsToolkit.ErrorHandling/pull/83/files). Essentially, `Source` lets an author teach a Computation Expression how to convert different types to a type if knows natively.
+The main issue I faced with the current implementation of the `result` and friends was maintainability.  I had to add _so many_ overloads for `BindResult` and `MergeSources` to get things to work correctly for different types, such as `Choice`. What the `Source` member does is [remove a lot of that repetitive, unmaintainable code](https://github.com/demystifyfp/FsToolkit.ErrorHandling/pull/83/files). Essentially, `Source` lets an author teach a Computation Expression how to convert different types to a type it knows natively.
+
 
 ## Conclusion
 
