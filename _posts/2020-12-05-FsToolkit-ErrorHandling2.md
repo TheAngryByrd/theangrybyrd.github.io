@@ -105,7 +105,7 @@ The last thing I'd like to cover doesn't affect consumers of this library but so
 
 I was investigating how [FSharp.Control.FusionTasks](https://github.com/kekyo/FSharp.Control.FusionTasks) was handling it's binding overloads and I came across an overload I was not familiar with, the [Source method](https://github.com/kekyo/FSharp.Control.FusionTasks/blob/master/FSharp.Control.FusionTasks/AsyncExtensions.fs#L194-L210). I came across [this StackOverflow post](https://stackoverflow.com/questions/35286541/why-would-you-use-builder-source-in-a-custom-computation-expression-builder) that explained it. 
 
-The main issue I faced with the current implementation of the `result` and friends was maintainability.  I had to add _so many_ overloads for `BindResult` and `MergeSources` to get things to work correctly for different types, such as `Choice`. What the `Source` member do is [remove a lot of that repetitive, unmaintainable code](https://github.com/demystifyfp/FsToolkit.ErrorHandling/pull/83/files). Essentially, `Source` lets an author teach a Computation Expression how to covert different types to a type if knows natively.
+The main issue I faced with the current implementation of the `result` and friends was maintainability.  I had to add _so many_ overloads for `BindResult` and `MergeSources` to get things to work correctly for different types, such as `Choice`. What the `Source` member do is [remove a lot of that repetitive, unmaintainable code](https://github.com/demystifyfp/FsToolkit.ErrorHandling/pull/83/files). Essentially, `Source` lets an author teach a Computation Expression how to convert different types to a type if knows natively.
 
 ## Conclusion
 
