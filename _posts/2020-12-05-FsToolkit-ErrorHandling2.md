@@ -66,7 +66,7 @@ type Validation<'a,'err> = Result<'a, 'err list>
 So you can see we're still using a `Result` under the hood but now we're going to have a `list` of `'err` for the return type. So if you change the `result` to `validation`
 
 ```fsharp
-let myThing : Result<int*int*int ,string> = valitation {
+let myThing : Result<int*int*int ,string> = validation {
     let! red = Ok 42
     and! green = Error "Can't be negative"
     and! blue = Error "'daba dee daba die' isn't a color"
